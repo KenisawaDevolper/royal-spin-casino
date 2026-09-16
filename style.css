@@ -1,0 +1,76 @@
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,Segoe UI,Arial}
+:root{--gold:#c9a84c;--gold2:#e6c56a;--bg:#080d1e;--card:#111e3b;--line:#22356b}
+body{background:var(--bg);color:#fff;overflow-x:hidden}
+a{color:var(--gold)}
+.topbar{background:var(--gold);color:#000;text-align:center;padding:6px;font-weight:800;font-size:.85rem}
+header{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:#0f1d3a;position:sticky;top:0;z-index:20;border-bottom:2px solid var(--gold);flex-wrap:wrap;gap:10px}
+.logo{font-weight:900;font-size:1.4rem;cursor:pointer;letter-spacing:1px}
+.logo span{color:var(--gold)}
+nav a{color:#fff;text-decoration:none;margin:0 8px;font-weight:700;font-size:.95rem}
+nav a:hover{color:var(--gold)}
+.header-actions{display:flex;gap:8px;align-items:center}
+.saldo-box{background:#1a2d5a;padding:8px 12px;border-radius:10px;font-weight:800;border:1px solid var(--line)}
+.saldo-box small{color:var(--gold);margin-left:6px}
+.btn-deposit{background:var(--gold);color:#000;border:none;padding:8px 14px;border-radius:8px;font-weight:900;cursor:pointer}
+.btn-login{background:transparent;color:#fff;border:1px solid var(--gold);padding:8px 14px;border-radius:8px;font-weight:800;cursor:pointer}
+.hero{background:radial-gradient(800px circle at 20% 0%, #1e3a7a 0%, transparent 60%), radial-gradient(600px circle at 90% 0%, #5a3a00 0%, transparent 60%), linear-gradient(180deg,#0f1d3a,#080d1e);text-align:center;padding:48px 18px}
+.badge{background:#1a2d5a;border:1px solid var(--gold);padding:6px 12px;border-radius:20px;font-size:.8rem;font-weight:800}
+.hero h1{font-size:3rem;margin:14px 0;line-height:1}
+.hero h1 span{color:var(--gold)}
+.hero-btns{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+.btn-cta{background:var(--gold);color:#000;border:none;padding:14px 26px;border-radius:30px;font-weight:900;font-size:1.05rem;cursor:pointer}
+.btn-ghost{background:transparent;color:#fff;border:1px solid #fff;padding:14px 22px;border-radius:30px;font-weight:800;cursor:pointer}
+.stats{display:flex;gap:18px;justify-content:center;margin-top:22px;flex-wrap:wrap}
+.stats div{background:#0f1d3a;border:1px solid var(--line);padding:10px 16px;border-radius:12px;min-width:120px}
+.stats b{display:block;font-size:1.2rem;color:var(--gold)}
+.section{max-width:1200px;margin:0 auto;padding:26px 18px}
+.section-title{color:var(--gold);margin-bottom:14px;font-size:1.5rem}
+.games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.game-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;text-align:center;cursor:pointer;transition:.15s}
+.game-card:hover{transform:translateY(-3px);border-color:var(--gold)}
+.game-card.featured{border-color:var(--gold);background:linear-gradient(180deg,#1a2d5a,#111e3b)}
+.game-card .thumb{font-size:2.2rem}
+.game-card h3{font-size:.95rem;margin:6px 0}
+.rtp{font-size:.7rem;opacity:.7}
+.games-detail{max-width:1200px;margin:0 auto;padding:0 18px;display:grid;gap:18px}
+.game-panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+.panel-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.panel-head h2{color:var(--gold);font-size:1.15rem}
+.jackpot{color:var(--gold2);font-weight:900;background:#000;padding:6px 10px;border-radius:8px}
+.live{color:#22c55e;font-weight:800}
+.control-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.control-row input,.control-row select{padding:8px;border-radius:8px;border:none;min-width:100px}
+.control-row button{padding:8px 12px;border-radius:8px;border:none;background:#22356b;color:#fff;font-weight:700;cursor:pointer}
+.slots-display{font-size:2.6rem;display:flex;justify-content:center;gap:8px;background:#000;padding:16px;border-radius:12px;border:2px solid var(--gold);margin:10px 0}
+.ruleta-wheel{font-size:2.4rem;text-align:center;background:#000;padding:18px;border-radius:12px;border:1px solid var(--line);transition:transform .8s}
+.bj-mesa{background:#0a2e1a;border:1px solid #1a5a2e;padding:14px;border-radius:10px;line-height:1.8;margin:10px 0}
+.bj-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.bj-btns button{padding:10px 14px;border-radius:8px;border:none;font-weight:800;cursor:pointer;background:#22356b;color:#fff}
+.btn-jugar{background:var(--gold);color:#000;border:none;padding:10px 16px;border-radius:10px;font-weight:900;cursor:pointer}
+.btn-jugar.big{width:100%;padding:14px;font-size:1.05rem}
+.btn-jugar:disabled{opacity:.5}
+.crash-display{text-align:center;background:#000;padding:18px;border-radius:12px;border:1px solid var(--line)}
+#crashMult{font-size:2.6rem;font-weight:900;color:var(--gold)}
+.crash-graph{height:8px;background:#22356b;border-radius:10px;margin-top:10px;overflow:hidden}
+.mines-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:360px;margin:12px auto}
+.mines-grid button{aspect-ratio:1;background:#1a2d5a;border:1px solid var(--line);border-radius:10px;font-size:1.4rem;cursor:pointer}
+.mines-grid button.revealed{background:#000}
+.mines-grid button.bomb{background:#7a1a1a}
+.dados-display{font-size:3rem;text-align:center;background:#000;padding:18px;border-radius:12px}
+.paytable{font-size:.75rem;opacity:.7;text-align:center;margin-top:8px}
+.msg{min-height:22px;font-weight:800;text-align:center;margin-top:8px}
+.historial{font-size:.8rem;opacity:.8;text-align:center;margin-top:6px}
+.two-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.card-dark{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.lista{list-style:none;margin-top:8px;max-height:220px;overflow:auto}
+.lista li{padding:6px 0;border-bottom:1px solid #1a2d5a;font-size:.9rem}
+.btn-small{margin-top:8px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:transparent;color:#fff;cursor:pointer}
+.footer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;text-align:left}
+footer{text-align:center;padding:22px 18px;background:#0a1024;border-top:1px solid var(--line);opacity:.9;font-size:.85rem;margin-top:18px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:50;padding:18px}
+.modal.hidden{display:none}
+.modal-box{background:#111e3b;border:1px solid var(--gold);border-radius:16px;padding:18px;min-width:300px;max-width:420px;width:100%;text-align:center}
+.modal-box input{width:100%;padding:10px;border-radius:8px;border:none;margin:8px 0}
+.dep-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.dep-grid button{padding:12px;border-radius:10px;border:none;background:var(--gold);font-weight:900;cursor:pointer}
+@media(max-width:600px){.hero h1{font-size:2.2rem}.slots-display{font-size:1.8rem}}
