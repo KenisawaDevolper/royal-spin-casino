@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Slots — Royal Spin</title><link rel="stylesheet" href="/style.css"></head><body>
+<div class="topbar">🎰 SLOTS ENDPOINT — /slots — Jackpot progresivo</div>
+<header><div class="logo" onclick="location.href='/'">♠️ ROYAL SPIN <span>CASINO</span></div><nav><a href="/">Lobby</a><a href="/slots" class="active">Slots</a><a href="/roulette">Ruleta</a><a href="/blackjack">Blackjack</a><a href="/crash">Crash</a><a href="/mines">Mines</a><a href="/dice">Dados</a></nav><div class="header-actions"><div class="saldo-box">💰 $<span id="saldo">0</span> <small id="userLevel">LVL 1</small></div><button class="btn-deposit" onclick="openDeposit()">DEPOSITAR</button><button class="btn-login" id="btnUser" onclick="openAuth()">INGRESAR</button></div></header>
+<section class="section" style="padding-bottom:0"><a href="/" style="color:#94a3b8;text-decoration:none">← Volver al Lobby</a></section>
+<main class="games-detail" style="margin-top:14px">
+<section class="game-panel">
+<div class="panel-head"><h2>🎰 ROYAL SLOTS — 5 Rodillos</h2><span class="jackpot">JACKPOT $<span id="jackpot">0</span></span></div>
+<div class="control-row"><label>Apuesta $ <input type="number" id="apuestaSlots" value="100" min="10" step="10"></label><button onclick="setBet('apuestaSlots',100)">100</button><button onclick="setBet('apuestaSlots',500)">500</button><button onclick="setBet('apuestaSlots',1000)">1000</button><button onclick="setBet('apuestaSlots',5000)">MAX</button></div>
+<div class="slots-display" id="slotsDisplay"><span id="s1">🍒</span><span id="s2">🍋</span><span id="s3">💎</span><span id="s4">7️⃣</span><span id="s5">⭐</span></div>
+<button class="btn-jugar big" onclick="jugarSlots()">🎰 GIRAR</button>
+<p id="msgSlots" class="msg"></p>
+<div class="paytable">3 iguales x5 • 4 iguales x10 • 5 iguales x50 • 5x 💎 = JACKPOT • Animación blur + glow al ganar</div>
+</section>
+<section class="card-dark"><h3>Cómo gana</h3><p style="color:#94a3b8;font-size:.9rem;margin-top:6px">Cada giro suma 5% al jackpot global (compartido entre todos los endpoints). 5 diamantes te llevan el pozo completo.</p><ul id="historialLista" class="lista"></ul></section>
+</main>
+<footer><p>Endpoint: <code>/slots</code> — <a href="/roulette">Ir a Ruleta →</a></p></footer>
+<div id="modalAuth" class="modal hidden"><div class="modal-box"><h3>Ingresar</h3><input id="authUser" placeholder="Usuario"><input id="authPass" type="password" placeholder="Contraseña demo"><button class="btn-jugar big" onclick="doAuth()">ENTRAR</button><p id="authMsg" class="msg"></p><button class="btn-ghost" onclick="closeAuth()">Cerrar</button></div></div>
+<div id="modalDeposit" class="modal hidden"><div class="modal-box"><h3>Depositar demo</h3><div class="dep-grid"><button onclick="depositar(1000)">+1,000</button><button onclick="depositar(5000)">+5,000</button><button onclick="depositar(10000)">+10,000</button><button onclick="depositar(50000)">+50k VIP</button></div><button class="btn-ghost" onclick="closeDeposit()">Cerrar</button></div></div>
+<div id="toast" class="toast"></div>
+<script src="/shared.js"></script>
+<script>
+updateSaldo(); document.getElementById('jackpot').textContent=jackpot.toLocaleString();
+function jugarSlots(){
+ const ap=parseInt(document.getElementById('apuestaSlots').value);
+ if(ap>saldo) return msg('msgSlots','Saldo insuficiente','tomato');
+ const display=document.getElementById('slotsDisplay');
+ display.classList.add('spinning'); display.classList.remove('win');
+ setTimeout(()=>{
+  saldo-=ap; jackpot+=Math.floor(ap*0.05);
+  const sims=['🍒','🍋','🔔','⭐','🍀','💎','7️⃣'];
+  function rnd(){ const r=Math.random(); if(r<0.04) return '💎'; if(r<0.08) return '7️⃣'; return sims[Math.floor(Math.random()*5)]; }
+  const r=[rnd(),rnd(),rnd(),rnd(),rnd()];
+  ['s1','s2','s3','s4','s5'].forEach((id,i)=>document.getElementById(id).textContent=r[i]);
+  display.classList.remove('spinning');
+  const c={}; r.forEach(s=>c[s]=(c[s]||0)+1); const max=Math.max(...Object.values(c)); const key=Object.keys(c).find(k=>c[k]===max);
+  let premio=0;
+  if(max===5){ premio=key==='💎'?jackpot:ap*50; if(key==='💎'){jackpot=20000} }
+  else if(max===4) premio=ap*10;
+  else if(max===3) premio=ap*5;
+  else if(max===2) premio=Math.floor(ap*0.6);
+  if(premio>0){ saldo+=premio; msg('msgSlots',`¡GANASTE $${premio.toLocaleString()}! [${r.join('')}]`,'#4ade80'); display.classList.add('win'); confettiBurst(); addHist(`Slots ${r.join('')} +$${premio}`,true); showToast(`Slots +$${premio}`)}
+  else { msg('msgSlots',`Perdiste [${r.join('')}]`,'tomato'); addHist(`Slots ${r.join('')} -$${ap}`,false)}
+  save(); updateSaldo(); document.getElementById('jackpot').textContent=jackpot.toLocaleString();
+ }, 700);
+}
+</script>
+</body></html>

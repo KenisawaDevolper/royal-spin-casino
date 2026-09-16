@@ -1,0 +1,70 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Crash — Royal Spin</title><link rel="stylesheet" href="/style.css"></head><body>
+<div class="topbar">🚀 CRASH ENDPOINT — /crash — Canvas + partículas</div>
+<header><div class="logo" onclick="location.href='/'">♠️ ROYAL SPIN <span>CASINO</span></div><nav><a href="/">Lobby</a><a href="/slots">Slots</a><a href="/roulette">Ruleta</a><a href="/blackjack">Blackjack</a><a href="/crash" class="active">Crash</a><a href="/mines">Mines</a><a href="/dice">Dados</a></nav><div class="header-actions"><div class="saldo-box">💰 $<span id="saldo">0</span> <small id="userLevel">LVL 1</small></div><button class="btn-deposit" onclick="openDeposit()">DEPOSITAR</button><button class="btn-login" id="btnUser" onclick="openAuth()">INGRESAR</button></div></header>
+<section class="section" style="padding-bottom:0"><a href="/" style="color:#94a3b8;text-decoration:none">← Lobby</a></section>
+<main class="games-detail" style="margin-top:14px">
+<section class="game-panel">
+<div class="panel-head"><h2>🚀 CRASH</h2><span class="live">● LIVE CANVAS</span></div>
+<div class="crash-display"><span id="crashMult">1.00x</span><canvas id="crashCanvas" class="crash-canvas" width="600" height="140"></canvas><div class="crash-graph" id="crashGraph"></div></div>
+<div class="control-row"><input type="number" id="apuestaCrash" value="100" min="10" step="10"><button id="btnCrash" class="btn-jugar" onclick="toggleCrash()">APOSTAR</button><button onclick="retirarCrash()" id="btnRetirarCrash" disabled>RETIRAR</button></div>
+<p id="msgCrash" class="msg"></p>
+</section>
+<section class="card-dark"><h3>Cómo jugar</h3><p style="color:#94a3b8;font-size:.9rem">El multiplicador sube. Retira antes de la explosión. Curva dibujada en canvas a 60fps + explosión de partículas.</p><ul id="historialLista" class="lista"></ul></section>
+</main>
+<footer><p>Endpoint: <code>/crash</code> — <a href="/mines">Mines →</a></p></footer>
+<div id="modalAuth" class="modal hidden"><div class="modal-box"><h3>Ingresar</h3><input id="authUser" placeholder="Usuario"><input id="authPass" type="password" placeholder="demo"><button class="btn-jugar big" onclick="doAuth()">ENTRAR</button><p id="authMsg" class="msg"></p><button class="btn-ghost" onclick="closeAuth()">Cerrar</button></div></div>
+<div id="modalDeposit" class="modal hidden"><div class="modal-box"><h3>Depositar</h3><div class="dep-grid"><button onclick="depositar(1000)">+1k</button><button onclick="depositar(5000)">+5k</button><button onclick="depositar(10000)">+10k</button><button onclick="depositar(50000)">+50k</button></div><button class="btn-ghost" onclick="closeDeposit()">Cerrar</button></div></div>
+<div id="toast" class="toast"></div>
+<script src="/shared.js"></script>
+<script>
+let crashActivo=false, crashMult=1, crashTimer=null, crashApuesta=0, crashExploded=false;
+const canvas=document.getElementById('crashCanvas'); const ctx=canvas.getContext('2d'); let points=[];
+function drawCurve(){
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+ ctx.strokeStyle='rgba(201,168,76,.9)'; ctx.lineWidth=3; ctx.beginPath();
+ points.forEach((p,i)=>{ const x=(i/points.length)*canvas.width; const y=canvas.height - (Math.log(p)/Math.log(8))*canvas.height*0.9 -10; if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); });
+ ctx.stroke();
+ // gradient fill
+ const g=ctx.createLinearGradient(0,0,0,canvas.height); g.addColorStop(0,'rgba(201,168,76,.25)'); g.addColorStop(1,'transparent');
+ ctx.lineTo(canvas.width, canvas.height); ctx.lineTo(0, canvas.height); ctx.closePath(); ctx.fillStyle=g; ctx.fill();
+}
+function explodeParticles(){
+ for(let i=0;i<20;i++){ const p=document.createElement('div'); p.style.position='fixed'; p.style.left='50%'; p.style.top='38%'; p.style.width='8px'; p.style.height='8px'; p.style.background='#ef4444'; p.style.borderRadius='50%'; p.style.pointerEvents='none'; document.body.appendChild(p);
+  const ang=Math.random()*Math.PI*2, dist=80+Math.random()*120; p.animate([{transform:'translate(0,0) scale(1)', opacity:1},{transform:`translate(${Math.cos(ang)*dist}px,${Math.sin(ang)*dist}px) scale(0)`, opacity:0}],{duration:700, easing:'cubic-bezier(.2,.8,.2,1)'}).onfinish=()=>p.remove();
+ }
+}
+function toggleCrash(){
+ if(crashActivo) return;
+ const ap=parseInt(document.getElementById('apuestaCrash').value);
+ if(ap>saldo) return msg('msgCrash','Saldo insuficiente','tomato');
+ crashApuesta=ap; saldo-=ap; save(); updateSaldo();
+ crashActivo=true; crashExploded=false; crashMult=1; points=[1];
+ document.getElementById('btnCrash').disabled=true; document.getElementById('btnRetirarCrash').disabled=false;
+ document.getElementById('crashMult').style.color='#c9a84c';
+ msg('msgCrash','¡En juego! Retira a tiempo','white');
+ const crashPoint=Math.random()<0.15?(1.05+Math.random()*0.4):(1.2+Math.random()*6);
+ crashTimer=setInterval(()=>{
+  crashMult+=0.04+crashMult*0.015; points.push(crashMult);
+  document.getElementById('crashMult').textContent=crashMult.toFixed(2)+'x';
+  document.getElementById('crashGraph').style.width=Math.min(100,(crashMult/8)*100)+'%';
+  drawCurve();
+  if(crashMult>=crashPoint){
+   clearInterval(crashTimer); crashActivo=false; crashExploded=true;
+   document.getElementById('crashMult').textContent='💥 '+crashMult.toFixed(2)+'x';
+   document.getElementById('crashMult').style.color='tomato';
+   document.getElementById('btnCrash').disabled=false; document.getElementById('btnRetirarCrash').disabled=true;
+   msg('msgCrash',`¡CRASH ${crashMult.toFixed(2)}x! -$${crashApuesta}`,'tomato'); explodeParticles(); addHist(`Crash 💥 ${crashMult.toFixed(2)}x -$${crashApuesta}`,false); save(); updateSaldo();
+  }
+ }, 80);
+}
+function retirarCrash(){
+ if(!crashActivo||crashExploded) return;
+ clearInterval(crashTimer); crashActivo=false;
+ const premio=Math.floor(crashApuesta*crashMult);
+ saldo+=premio;
+ document.getElementById('btnCrash').disabled=false; document.getElementById('btnRetirarCrash').disabled=true;
+ msg('msgCrash',`Retiraste ${crashMult.toFixed(2)}x +$${premio}!`,'#4ade80'); confettiBurst(); addHist(`Crash ${crashMult.toFixed(2)}x +$${premio}`,true); showToast(`Crash +$${premio}`); save(); updateSaldo();
+}
+updateSaldo(); drawCurve();
+</script>
+</body></html>

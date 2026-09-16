@@ -1,0 +1,38 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Blackjack — Royal Spin</title><link rel="stylesheet" href="/style.css"></head><body>
+<div class="topbar">🃏 BLACKJACK ENDPOINT — /blackjack — Cartas con flip</div>
+<header><div class="logo" onclick="location.href='/'">♠️ ROYAL SPIN <span>CASINO</span></div><nav><a href="/">Lobby</a><a href="/slots">Slots</a><a href="/roulette">Ruleta</a><a href="/blackjack" class="active">Blackjack</a><a href="/crash">Crash</a><a href="/mines">Mines</a><a href="/dice">Dados</a></nav><div class="header-actions"><div class="saldo-box">💰 $<span id="saldo">0</span> <small id="userLevel">LVL 1</small></div><button class="btn-deposit" onclick="openDeposit()">DEPOSITAR</button><button class="btn-login" id="btnUser" onclick="openAuth()">INGRESAR</button></div></header>
+<section class="section" style="padding-bottom:0"><a href="/" style="color:#94a3b8;text-decoration:none">← Lobby</a></section>
+<main class="games-detail" style="margin-top:14px">
+<section class="game-panel">
+<div class="panel-head"><h2>🃏 BLACKJACK 21</h2><span style="color:var(--gold)">RTP 99.2%</span></div>
+<div class="control-row"><label>Apuesta $ <input type="number" id="apuestaBJ" value="100" min="10" step="10"></label></div>
+<div class="bj-mesa"><div>Dealer: <span id="dealerCartas">-</span> (<span id="dealerPuntos">?</span>)</div><div>Tú: <span id="jugadorCartas">-</span> (<span id="jugadorPuntos">?</span>)</div></div>
+<div class="bj-btns"><button class="btn-jugar" onclick="iniciarBJ()">REPARTIR</button><button onclick="pedirCarta()">PEDIR</button><button onclick="plantarse()">PLANTARSE</button><button onclick="doblar()">DOBLAR x2</button></div>
+<p id="msgBJ" class="msg"></p>
+</section>
+<section class="card-dark"><h3>Reglas</h3><p style="color:#94a3b8;font-size:.9rem">Dealer pide hasta 17. Blackjack paga 3:2. Animación flip en cada carta.</p><ul id="historialLista" class="lista"></ul></section>
+</main>
+<footer><p>Endpoint: <code>/blackjack</code> — <a href="/crash">Crash →</a></p></footer>
+<div id="modalAuth" class="modal hidden"><div class="modal-box"><h3>Ingresar</h3><input id="authUser" placeholder="Usuario"><input id="authPass" type="password" placeholder="demo"><button class="btn-jugar big" onclick="doAuth()">ENTRAR</button><p id="authMsg" class="msg"></p><button class="btn-ghost" onclick="closeAuth()">Cerrar</button></div></div>
+<div id="modalDeposit" class="modal hidden"><div class="modal-box"><h3>Depositar</h3><div class="dep-grid"><button onclick="depositar(1000)">+1k</button><button onclick="depositar(5000)">+5k</button><button onclick="depositar(10000)">+10k</button><button onclick="depositar(50000)">+50k</button></div><button class="btn-ghost" onclick="closeDeposit()">Cerrar</button></div></div>
+<div id="toast" class="toast"></div>
+<script src="/shared.js"></script>
+<script>
+let player=[],dealer=[],jugando=false,apuestaBJ=0,doblado=false;
+function v(c){if(['J','Q','K'].includes(c))return 10;if(c==='A')return 11;return parseInt(c)}
+function pts(m){let p=m.reduce((a,c)=>a+v(c),0);let ac=m.filter(c=>c==='A').length;while(p>21&&ac>0){p-=10;ac--}return p}
+function carta(){return ['A','2','3','4','5','6','7','8','9','10','J','Q','K'][Math.floor(Math.random()*13)]}
+function iniciarBJ(){const ap=parseInt(document.getElementById('apuestaBJ').value); if(ap>saldo) return msg('msgBJ','Saldo insuficiente','tomato'); apuestaBJ=ap; doblado=false; player=[carta(),carta()]; dealer=[carta(),carta()]; jugando=true; updBJ(); if(pts(player)===21) setTimeout(()=>finalizarBJ(),400); else msg('msgBJ','Pide, plántate o dobla','white')}
+function pedirCarta(){ if(!jugando) return; player.push(carta()); updBJ(); if(pts(player)>21) finalizarBJ();}
+function plantarse(){ if(!jugando) return; while(pts(dealer)<17) dealer.push(carta()); finalizarBJ();}
+function doblar(){ if(!jugando||player.length!==2) return msg('msgBJ','Solo al inicio','tomato'); if(saldo<apuestaBJ) return msg('msgBJ','Saldo insuficiente','tomato'); doblado=true; apuestaBJ*=2; player.push(carta()); updBJ(); if(pts(player)<=21){ while(pts(dealer)<17) dealer.push(carta()); } finalizarBJ();}
+function updBJ(){
+ document.getElementById('jugadorCartas').innerHTML=player.map(c=>`<span class="card" style="display:inline-block;background:#fff;color:#000;padding:4px 8px;border-radius:8px;margin:2px;animation:cardFlip .3s ease">${c}</span>`).join(' ');
+ document.getElementById('jugadorPuntos').textContent=pts(player);
+ if(jugando){ document.getElementById('dealerCartas').innerHTML=`<span class="card" style="background:#fff;color:#000;padding:4px 8px;border-radius:8px">${dealer[0]}</span> <span style="background:#1a2a55;padding:4px 8px;border-radius:8px">🂠</span>`; document.getElementById('dealerPuntos').textContent='?' }
+ else { document.getElementById('dealerCartas').innerHTML=dealer.map(c=>`<span class="card" style="display:inline-block;background:#fff;color:#000;padding:4px 8px;border-radius:8px;margin:2px;animation:cardFlip .3s ease">${c}</span>`).join(' '); document.getElementById('dealerPuntos').textContent=pts(dealer) }
+}
+function finalizarBJ(){ jugando=false; updBJ(); const pp=pts(player),pd=pts(dealer); let res='',win=false; if(pp>21){ saldo-=apuestaBJ; res=`Te pasaste ${pp} -$${apuestaBJ}` } else if(pd>21||pp>pd){ saldo+=apuestaBJ; res=`¡Ganaste +$${apuestaBJ}! ${pp} vs ${pd}`; win=true; confettiBurst()} else if(pp===pd) res=`Empate ${pp}`; else { saldo-=apuestaBJ; res=`Perdiste -$${apuestaBJ} ${pp} vs ${pd}` } msg('msgBJ',res,win?'#4ade80':'tomato'); addHist(`BJ ${pp} vs ${pd} ${win?'+$'+apuestaBJ:'-$'+apuestaBJ}`,win); if(win) showToast(`BJ +$${apuestaBJ}`); save(); updateSaldo();}
+updateSaldo();
+</script>
+</body></html>

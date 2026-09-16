@@ -1,0 +1,44 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Ruleta — Royal Spin</title><link rel="stylesheet" href="/style.css"></head><body>
+<div class="topbar">🎡 ROULETTE ENDPOINT — /roulette — Animación rueda física</div>
+<header><div class="logo" onclick="location.href='/'">♠️ ROYAL SPIN <span>CASINO</span></div><nav><a href="/">Lobby</a><a href="/slots">Slots</a><a href="/roulette" class="active">Ruleta</a><a href="/blackjack">Blackjack</a><a href="/crash">Crash</a><a href="/mines">Mines</a><a href="/dice">Dados</a></nav><div class="header-actions"><div class="saldo-box">💰 $<span id="saldo">0</span> <small id="userLevel">LVL 1</small></div><button class="btn-deposit" onclick="openDeposit()">DEPOSITAR</button><button class="btn-login" id="btnUser" onclick="openAuth()">INGRESAR</button></div></header>
+<section class="section" style="padding-bottom:0"><a href="/" style="color:#94a3b8;text-decoration:none">← Lobby</a></section>
+<main class="games-detail" style="margin-top:14px">
+<section class="game-panel">
+<div class="panel-head"><h2>🎡 RULETA EUROPEA</h2><span class="live">● Animada</span></div>
+<div class="ruleta-wheel" id="ruletaWheel">● 0</div>
+<div class="control-row"><select id="apuestaRuleta"><option value="rojo">🔴 Rojo x2</option><option value="negro">⚫ Negro x2</option><option value="verde">🟢 Verde 0 x14</option><option value="par">Par x2</option><option value="impar">Impar x2</option></select><input type="number" id="apuestaRuletaValor" value="100" min="10" step="10"><button onclick="setBet('apuestaRuletaValor',500)">500</button></div>
+<button class="btn-jugar big" onclick="jugarRuleta()">GIRAR RULETA</button>
+<p id="msgRuleta" class="msg"></p><div class="historial" id="historialRuleta">Últimos: -</div>
+</section>
+<section class="card-dark"><h3>Probabilidades</h3><p style="color:#94a3b8;font-size:.9rem">Verde 0 = 2.7% y paga x14. Ruleta gira con easing cúbico y rebote de bola.</p><ul id="historialLista" class="lista"></ul></section>
+</main>
+<footer><p>Endpoint: <code>/roulette</code> — <a href="/blackjack">Blackjack →</a></p></footer>
+<div id="modalAuth" class="modal hidden"><div class="modal-box"><h3>Ingresar</h3><input id="authUser" placeholder="Usuario"><input id="authPass" type="password" placeholder="demo"><button class="btn-jugar big" onclick="doAuth()">ENTRAR</button><p id="authMsg" class="msg"></p><button class="btn-ghost" onclick="closeAuth()">Cerrar</button></div></div>
+<div id="modalDeposit" class="modal hidden"><div class="modal-box"><h3>Depositar demo</h3><div class="dep-grid"><button onclick="depositar(1000)">+1k</button><button onclick="depositar(5000)">+5k</button><button onclick="depositar(10000)">+10k</button><button onclick="depositar(50000)">+50k</button></div><button class="btn-ghost" onclick="closeDeposit()">Cerrar</button></div></div>
+<div id="toast" class="toast"></div>
+<script src="/shared.js"></script>
+<script>
+let hist=[]; updateSaldo();
+function jugarRuleta(){
+ const ap=parseInt(document.getElementById('apuestaRuletaValor').value);
+ const ele=document.getElementById('apuestaRuleta').value;
+ if(ap>saldo) return msg('msgRuleta','Saldo insuficiente','tomato');
+ saldo-=ap; save(); updateSaldo();
+ const num=Math.floor(Math.random()*37);
+ const color=num===0?'verde':num%2===0?'negro':'rojo';
+ const par=num===0?'verde':num%2===0?'par':'impar';
+ const win=(ele===color)||(ele===par);
+ const w=document.getElementById('ruletaWheel');
+ w.style.transform=`rotate(${720+num*17}deg) scale(1.05)`;
+ setTimeout(()=>w.style.transform=`rotate(${720+num*17}deg) scale(1)`, 800);
+ w.textContent=`${num} ${color==='rojo'?'🔴':color==='negro'?'⚫':'🟢'}`;
+ w.style.color=color==='rojo'?'#ef4444':color==='negro'?'#fff':'#22c55e';
+ hist.unshift(num); if(hist.length>10) hist.pop();
+ document.getElementById('historialRuleta').textContent='Últimos: '+hist.join(' - ');
+ let premio=0; if(win) premio=ele==='verde'?ap*14:ap*2;
+ if(premio>0){ saldo+=premio; msg('msgRuleta',`Salió ${num} ${color} ¡+$${premio}!`,'#4ade80'); confettiBurst(); addHist(`Ruleta ${num} ${color} +$${premio}`,true); showToast(`Ruleta +$${premio}`)}
+ else { msg('msgRuleta',`Salió ${num} ${color}. -$${ap}`,'tomato'); addHist(`Ruleta ${num} -$${ap}`,false)}
+ save(); updateSaldo();
+}
+</script>
+</body></html>

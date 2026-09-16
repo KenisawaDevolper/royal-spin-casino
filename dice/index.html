@@ -1,0 +1,41 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Dados — Royal Spin</title><link rel="stylesheet" href="/style.css"></head><body>
+<div class="topbar">🎲 DICE ENDPOINT — /dice — Física shake</div>
+<header><div class="logo" onclick="location.href='/'">♠️ ROYAL SPIN <span>CASINO</span></div><nav><a href="/">Lobby</a><a href="/slots">Slots</a><a href="/roulette">Ruleta</a><a href="/blackjack">Blackjack</a><a href="/crash">Crash</a><a href="/mines">Mines</a><a href="/dice" class="active">Dados</a></nav><div class="header-actions"><div class="saldo-box">💰 $<span id="saldo">0</span> <small id="userLevel">LVL 1</small></div><button class="btn-deposit" onclick="openDeposit()">DEPOSITAR</button><button class="btn-login" id="btnUser" onclick="openAuth()">INGRESAR</button></div></header>
+<section class="section" style="padding-bottom:0"><a href="/" style="color:#94a3b8;text-decoration:none">← Lobby</a></section>
+<main class="games-detail" style="margin-top:14px">
+<section class="game-panel">
+<div class="panel-head"><h2>🎲 DADOS</h2><span style="color:var(--gold)">Shake anim</span></div>
+<div class="dados-display" id="dadosDisplay">🎲 🎲</div>
+<div class="control-row"><select id="dadosModo"><option value="mayor50">> 50 gana x2</option><option value="mayor70">> 70 gana x3</option><option value="exacto">Par exacto (dobles) x5</option></select><input type="number" id="apuestaDados" value="100" min="10" step="10"></div>
+<button class="btn-jugar big" onclick="jugarDados()">LANZAR DADOS</button>
+<p id="msgDados" class="msg"></p>
+</section>
+<section class="card-dark"><h3>Cómo gana</h3><p style="color:#94a3b8;font-size:.9rem">Modo mayor50/70 usa roll 1-100. Modo exacto requiere dobles (1-1, 2-2...). Animación shake + rebote.</p><ul id="historialLista" class="lista"></ul></section>
+</main>
+<footer><p>Endpoint: <code>/dice</code> — <a href="/">Volver al Lobby</a></p></footer>
+<div id="modalAuth" class="modal hidden"><div class="modal-box"><h3>Ingresar</h3><input id="authUser" placeholder="Usuario"><input id="authPass" type="password" placeholder="demo"><button class="btn-jugar big" onclick="doAuth()">ENTRAR</button><p id="authMsg" class="msg"></p><button class="btn-ghost" onclick="closeAuth()">Cerrar</button></div></div>
+<div id="modalDeposit" class="modal hidden"><div class="modal-box"><h3>Depositar</h3><div class="dep-grid"><button onclick="depositar(1000)">+1k</button><button onclick="depositar(5000)">+5k</button><button onclick="depositar(10000)">+10k</button><button onclick="depositar(50000)">+50k</button></div><button class="btn-ghost" onclick="closeDeposit()">Cerrar</button></div></div>
+<div id="toast" class="toast"></div>
+<script src="/shared.js"></script>
+<script>
+updateSaldo();
+function jugarDados(){
+ const ap=parseInt(document.getElementById('apuestaDados').value); const modo=document.getElementById('dadosModo').value;
+ if(ap>saldo) return msg('msgDados','Saldo insuficiente','tomato');
+ const disp=document.getElementById('dadosDisplay'); disp.classList.add('rolling');
+ setTimeout(()=>{
+  disp.classList.remove('rolling'); saldo-=ap; save(); updateSaldo();
+  const d1=Math.floor(Math.random()*6)+1, d2=Math.floor(Math.random()*6)+1; const roll=Math.floor(Math.random()*100)+1;
+  disp.textContent=`🎲 ${d1} + ${d2} = ${d1+d2} | Roll ${roll}`;
+  disp.animate([{transform:'scale(1)'},{transform:'scale(1.08)'},{transform:'scale(1)'}],{duration:250});
+  let win=false, premio=0;
+  if(modo==='mayor50') win=roll>50;
+  if(modo==='mayor70') win=roll>70;
+  if(modo==='exacto') win=d1===d2;
+  if(win){ premio=modo==='mayor70'?ap*3:modo==='exacto'?ap*5:ap*2; saldo+=premio; msg('msgDados',`¡GANASTE $${premio}! Roll ${roll}`,'#4ade80'); confettiBurst(); addHist(`Dados ${roll} +$${premio}`,true); showToast(`Dados +$${premio}`)}
+  else { msg('msgDados',`Perdiste Roll ${roll} -$${ap}`,'tomato'); addHist(`Dados ${roll} -$${ap}`,false)}
+  save(); updateSaldo();
+ }, 500);
+}
+</script>
+</body></html>

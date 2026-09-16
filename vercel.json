@@ -1,10 +1,14 @@
 {
   "cleanUrls": true,
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "rewrites": [
+    { "source": "/slots", "destination": "/slots/index.html" },
+    { "source": "/roulette", "destination": "/roulette/index.html" },
+    { "source": "/blackjack", "destination": "/blackjack/index.html" },
+    { "source": "/crash", "destination": "/crash/index.html" },
+    { "source": "/mines", "destination": "/mines/index.html" },
+    { "source": "/dice", "destination": "/dice/index.html" }
+  ],
   "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
-    }
+    { "source": "/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }] }
   ]
 }

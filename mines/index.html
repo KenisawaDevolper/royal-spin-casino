@@ -1,0 +1,50 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Mines — Royal Spin</title><link rel="stylesheet" href="/style.css"></head><body>
+<div class="topbar">💣 MINES ENDPOINT — /mines — Grid con flip 3D</div>
+<header><div class="logo" onclick="location.href='/'">♠️ ROYAL SPIN <span>CASINO</span></div><nav><a href="/">Lobby</a><a href="/slots">Slots</a><a href="/roulette">Ruleta</a><a href="/blackjack">Blackjack</a><a href="/crash">Crash</a><a href="/mines" class="active">Mines</a><a href="/dice">Dados</a></nav><div class="header-actions"><div class="saldo-box">💰 $<span id="saldo">0</span> <small id="userLevel">LVL 1</small></div><button class="btn-deposit" onclick="openDeposit()">DEPOSITAR</button><button class="btn-login" id="btnUser" onclick="openAuth()">INGRESAR</button></div></header>
+<section class="section" style="padding-bottom:0"><a href="/" style="color:#94a3b8;text-decoration:none">← Lobby</a></section>
+<main class="games-detail" style="margin-top:14px">
+<section class="game-panel">
+<div class="panel-head"><h2>💣 MINES 5x5</h2><span style="color:#94a3b8">Flip + shine</span></div>
+<div class="control-row"><label>Minas <select id="minasCount"><option value="3">3</option><option value="5" selected>5</option><option value="8">8</option></select></label><label>Apuesta $ <input type="number" id="apuestaMines" value="100" min="10" step="10"></label><button onclick="iniciarMines()">NUEVO JUEGO</button></div>
+<div class="mines-grid" id="minesGrid"></div>
+<div class="control-row"><button onclick="retirarMines()" id="btnRetirarMines">RETIRAR $0</button><span id="msgMines" class="msg"></span></div>
+</section>
+<section class="card-dark"><h3>Multiplicador</h3><p style="color:#94a3b8;font-size:.9rem">Cada diamante sube el multiplicador. Retira antes de la bomba. Animación flip 3D.</p><ul id="historialLista" class="lista"></ul></section>
+</main>
+<footer><p>Endpoint: <code>/mines</code> — <a href="/dice">Dados →</a></p></footer>
+<div id="modalAuth" class="modal hidden"><div class="modal-box"><h3>Ingresar</h3><input id="authUser" placeholder="Usuario"><input id="authPass" type="password" placeholder="demo"><button class="btn-jugar big" onclick="doAuth()">ENTRAR</button><p id="authMsg" class="msg"></p><button class="btn-ghost" onclick="closeAuth()">Cerrar</button></div></div>
+<div id="modalDeposit" class="modal hidden"><div class="modal-box"><h3>Depositar</h3><div class="dep-grid"><button onclick="depositar(1000)">+1k</button><button onclick="depositar(5000)">+5k</button><button onclick="depositar(10000)">+10k</button><button onclick="depositar(50000)">+50k</button></div><button class="btn-ghost" onclick="closeDeposit()">Cerrar</button></div></div>
+<div id="toast" class="toast"></div>
+<script src="/shared.js"></script>
+<script>
+let mines=[], reveladas=0, activa=false, apuesta=0, mult=1;
+function iniciarMines(){
+ const ap=parseInt(document.getElementById('apuestaMines').value); const n=parseInt(document.getElementById('minasCount').value);
+ if(ap>saldo) return msg('msgMines','Saldo insuficiente','tomato');
+ apuesta=ap; activa=true; reveladas=0; mult=1; mines=Array(25).fill(0);
+ let c=0; while(c<n){ const i=Math.floor(Math.random()*25); if(mines[i]===0){mines[i]=1;c++}}
+ render(); updBtn(); msg('msgMines','Evita las 💣','white');
+}
+function render(){
+ const g=document.getElementById('minesGrid'); g.innerHTML='';
+ mines.forEach((isBomb,i)=>{
+  const b=document.createElement('button'); b.id='mine-'+i; b.textContent='?'; b.onclick=()=>clickMine(i); g.appendChild(b);
+ });
+}
+function clickMine(i){
+ if(!activa) return; const btn=document.getElementById('mine-'+i); if(btn.classList.contains('revealed')) return;
+ btn.classList.add('revealed');
+ if(mines[i]===1){
+  btn.textContent='💣'; btn.classList.add('bomb');
+  mines.forEach((v,idx)=>{ const bb=document.getElementById('mine-'+idx); if(v===1){bb.textContent='💣'; bb.classList.add('bomb')} else if(!bb.classList.contains('revealed')) bb.textContent='💎'});
+  saldo-=apuesta; activa=false; msg('msgMines',`¡BOMBA! -$${apuesta}`,'tomato'); addHist(`Mines 💣 -$${apuesta}`,false); save(); updateSaldo(); updBtn(); btn.animate([{transform:'scale(1)'},{transform:'scale(1.2)'},{transform:'scale(1)'}],{duration:300});
+ } else {
+  btn.textContent='💎'; btn.style.background='linear-gradient(180deg,#0a3d1a,#052a12)'; reveladas++; mult=1+reveladas*(0.26+parseInt(document.getElementById('minasCount').value)*0.04); updBtn();
+  btn.animate([{transform:'rotateY(90deg)'},{transform:'rotateY(0)'}],{duration:300});
+ }
+}
+function updBtn(){ const premio=activa&&reveladas>0?Math.floor(apuesta*mult):0; document.getElementById('btnRetirarMines').textContent=activa&&reveladas>0?`RETIRAR $${premio} (${mult.toFixed(2)}x)`:'RETIRAR $0'}
+function retirarMines(){ if(!activa||reveladas===0) return msg('msgMines','Revela 1 💎','tomato'); const premio=Math.floor(apuesta*mult); saldo+=premio; activa=false; msg('msgMines',`+$${premio} con ${reveladas} 💎`,'#4ade80'); confettiBurst(); addHist(`Mines ${reveladas}💎 +$${premio}`,true); showToast(`Mines +$${premio}`); save(); updateSaldo(); updBtn();}
+updateSaldo(); render();
+</script>
+</body></html>
