@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Slots — Royal Spin</title><link rel="stylesheet" href="/style.css"></head><body>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Slots — Royal Spin</title><link rel="stylesheet" href="/style.css"><script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+</head><body>
 <div class="topbar">🎰 SLOTS ENDPOINT — /slots — Jackpot progresivo</div>
 <header><div class="logo" onclick="location.href='/'">♠️ ROYAL SPIN <span>CASINO</span></div><nav><a href="/">Lobby</a><a href="/slots" class="active">Slots</a><a href="/roulette">Ruleta</a><a href="/blackjack">Blackjack</a><a href="/crash">Crash</a><a href="/mines">Mines</a><a href="/dice">Dados</a></nav><div class="header-actions"><div class="saldo-box">💰 $<span id="saldo">0</span> <small id="userLevel">LVL 1</small></div><button class="btn-deposit" onclick="openDeposit()">DEPOSITAR</button><button class="btn-login" id="btnUser" onclick="openAuth()">INGRESAR</button></div></header>
 <section class="section" style="padding-bottom:0"><a href="/" style="color:#94a3b8;text-decoration:none">← Volver al Lobby</a></section>
@@ -25,14 +26,20 @@ function jugarSlots(){
  const ap=parseInt(document.getElementById('apuestaSlots').value);
  if(ap>saldo) return msg('msgSlots','Saldo insuficiente','tomato');
  const display=document.getElementById('slotsDisplay');
- display.classList.add('spinning'); display.classList.remove('win');
- setTimeout(()=>{
+ display.classList.remove('win');
+ // GSAP reel spin
+ const reels=['s1','s2','s3','s4','s5'].map(id=>document.getElementById(id));
+ if(window.gsap){
+  gsap.to(reels,{y:-30,opacity:0.3,filter:'blur(3px)',duration:.12,stagger:.05,repeat:3,yoyo:true,ease:'power1.inOut',onComplete:doSpin});
+ } else { display.classList.add('spinning'); setTimeout(doSpin,700); }
+ function doSpin(){
   saldo-=ap; jackpot+=Math.floor(ap*0.05);
   const sims=['🍒','🍋','🔔','⭐','🍀','💎','7️⃣'];
   function rnd(){ const r=Math.random(); if(r<0.04) return '💎'; if(r<0.08) return '7️⃣'; return sims[Math.floor(Math.random()*5)]; }
   const r=[rnd(),rnd(),rnd(),rnd(),rnd()];
   ['s1','s2','s3','s4','s5'].forEach((id,i)=>document.getElementById(id).textContent=r[i]);
-  display.classList.remove('spinning');
+  if(!window.gsap) display.classList.remove('spinning');
+  if(window.gsap) gsap.fromTo(reels,{y:30,opacity:0,scale:.8},{y:0,opacity:1,scale:1,duration:.4,stagger:.07,ease:'back.out(1.4)'});
   const c={}; r.forEach(s=>c[s]=(c[s]||0)+1); const max=Math.max(...Object.values(c)); const key=Object.keys(c).find(k=>c[k]===max);
   let premio=0;
   if(max===5){ premio=key==='💎'?jackpot:ap*50; if(key==='💎'){jackpot=20000} }
@@ -42,7 +49,7 @@ function jugarSlots(){
   if(premio>0){ saldo+=premio; msg('msgSlots',`¡GANASTE $${premio.toLocaleString()}! [${r.join('')}]`,'#4ade80'); display.classList.add('win'); confettiBurst(); addHist(`Slots ${r.join('')} +$${premio}`,true); showToast(`Slots +$${premio}`)}
   else { msg('msgSlots',`Perdiste [${r.join('')}]`,'tomato'); addHist(`Slots ${r.join('')} -$${ap}`,false)}
   save(); updateSaldo(); document.getElementById('jackpot').textContent=jackpot.toLocaleString();
- }, 700);
+  }
 }
 </script>
 </body></html>

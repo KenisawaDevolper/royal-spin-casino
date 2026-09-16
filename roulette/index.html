@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Ruleta — Royal Spin</title><link rel="stylesheet" href="/style.css"></head><body>
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Ruleta — Royal Spin</title><link rel="stylesheet" href="/style.css"><script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+</head><body>
 <div class="topbar">🎡 ROULETTE ENDPOINT — /roulette — Animación rueda física</div>
 <header><div class="logo" onclick="location.href='/'">♠️ ROYAL SPIN <span>CASINO</span></div><nav><a href="/">Lobby</a><a href="/slots">Slots</a><a href="/roulette" class="active">Ruleta</a><a href="/blackjack">Blackjack</a><a href="/crash">Crash</a><a href="/mines">Mines</a><a href="/dice">Dados</a></nav><div class="header-actions"><div class="saldo-box">💰 $<span id="saldo">0</span> <small id="userLevel">LVL 1</small></div><button class="btn-deposit" onclick="openDeposit()">DEPOSITAR</button><button class="btn-login" id="btnUser" onclick="openAuth()">INGRESAR</button></div></header>
 <section class="section" style="padding-bottom:0"><a href="/" style="color:#94a3b8;text-decoration:none">← Lobby</a></section>
@@ -29,10 +30,15 @@ function jugarRuleta(){
  const par=num===0?'verde':num%2===0?'par':'impar';
  const win=(ele===color)||(ele===par);
  const w=document.getElementById('ruletaWheel');
- w.style.transform=`rotate(${720+num*17}deg) scale(1.05)`;
- setTimeout(()=>w.style.transform=`rotate(${720+num*17}deg) scale(1)`, 800);
  w.textContent=`${num} ${color==='rojo'?'🔴':color==='negro'?'⚫':'🟢'}`;
  w.style.color=color==='rojo'?'#ef4444':color==='negro'?'#fff':'#22c55e';
+ if(window.gsap){
+  gsap.fromTo(w,{rotation:0,scale:0.9},{rotation:720+num*17,scale:1,duration:1.4,ease:'power4.out'});
+  gsap.fromTo(w,{filter:'blur(3px)'},{filter:'blur(0px)',duration:.8,ease:'power2.out'});
+ } else {
+  w.style.transform=`rotate(${720+num*17}deg) scale(1.05)`;
+  setTimeout(()=>w.style.transform=`rotate(${720+num*17}deg) scale(1)`, 800);
+ }
  hist.unshift(num); if(hist.length>10) hist.pop();
  document.getElementById('historialRuleta').textContent='Últimos: '+hist.join(' - ');
  let premio=0; if(win) premio=ele==='verde'?ap*14:ap*2;
