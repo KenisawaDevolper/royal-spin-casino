@@ -33,7 +33,6 @@ function showToast(t){
  } else { el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2200)}
 }
 function confettiBurst(){
- // GSAP confetti
  for(let i=0;i<22;i++){
   const d=document.createElement('div'); d.className='confetti'; d.style.left=Math.random()*100+'vw'; d.style.background=`hsl(${40+Math.random()*20},100%,50%)`; document.body.appendChild(d);
   if(window.gsap){
@@ -41,7 +40,6 @@ function confettiBurst(){
   } else setTimeout(()=>d.remove(),1300)
  }
 }
-// GSAP page intro
 function initGSAP(){
  if(!window.gsap) return;
  gsap.from('header',{y:-60,opacity:0,duration:.6,ease:'power3.out'});
@@ -54,3 +52,61 @@ function initGSAP(){
 document.addEventListener('DOMContentLoaded', initGSAP);
 setInterval(()=>{jackpot+=Math.floor(Math.random()*6); const j=$('statJackpot'); if(j){ j.textContent='$'+jackpot.toLocaleString(); if(window.gsap) gsap.fromTo(j,{scale:1.08},{scale:1,duration:.3,ease:'power2.out'}) }},2600);
 setInterval(()=>{const el=$('statJugadores'); if(el) el.textContent=(12847+Math.floor(Math.random()*24)).toLocaleString()},3200);
+
+// ===== CANVAS PARTÍCULAS GLOBAL + GIFT =====
+(function(){
+ function ensureBg(){
+  if(document.getElementById('bgCanvas')) return document.getElementById('bgCanvas');
+  const c=document.createElement('canvas'); c.id='bgCanvas'; document.body.prepend(c); return c;
+ }
+ function initCanvas(){
+  const canvas=ensureBg(); const ctx=canvas.getContext('2d'); let w,h, parts=[];
+  function resize(){ w=canvas.width=window.innerWidth; h=canvas.height=window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const count= window.innerWidth<640?28:48;
+  for(let i=0;i<count;i++) parts.push({x:Math.random()*w, y:Math.random()*h, r:1+Math.random()*2.2, vx:(Math.random()-0.5)*0.3, vy:-0.2 - Math.random()*0.6, a:0.25+Math.random()*0.45, hue: 38+Math.random()*18});
+  function tick(){
+   ctx.clearRect(0,0,w,h);
+   // glow radial
+   parts.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.y< -10){ p.y=h+10; p.x=Math.random()*w; }
+    if(p.x<0||p.x>w) p.vx*=-1;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=`hsla(${p.hue},95%,60%,${p.a})`;
+    ctx.shadowColor=`hsla(${p.hue},95%,60%,.8)`; ctx.shadowBlur=8;
+    ctx.fill(); ctx.shadowBlur=0;
+    // line conection cercana
+    parts.forEach(q=>{
+     const dx=p.x-q.x, dy=p.y-q.y, d=Math.hypot(dx,dy);
+     if(d<110 && q!==p){ ctx.strokeStyle=`hsla(${p.hue},80%,60%,${0.07*(1-d/110)})`; ctx.lineWidth=0.7; ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke(); }
+    })
+   });
+   requestAnimationFrame(tick);
+  }
+  tick();
+ }
+ // gift flotante
+ function ensureGift(){
+  if(document.getElementById('giftFloat')) return;
+  const g=document.createElement('div'); g.id='giftFloat'; g.className='gift-float';
+  g.innerHTML='<span>🎁</span><span class="gift-count">x3</span>';
+  g.title='Regalo sorpresa - click para abrir';
+  g.onclick=()=>{
+   if(window.gsap) gsap.fromTo(g,{scale:1},{scale:1.15,duration:.15,yoyo:true,repeat:1,ease:'power2.out'});
+   const bonus=500+Math.floor(Math.random()*1500);
+   saldo+=bonus; save(); updateSaldo(); showToast(`🎁 ¡Regalo! +$${bonus}`);
+   confettiBurst();
+   // anim +1 flotante
+   const fly=document.createElement('div'); fly.textContent=`+$${bonus}`; fly.style.position='fixed'; fly.style.right='34px'; fly.style.bottom='90px'; fly.style.background='linear-gradient(90deg,#c9a84c,#f0d76a)'; fly.style.color='#000'; fly.style.padding='6px 10px'; fly.style.borderRadius='999px'; fly.style.fontWeight='900'; fly.style.zIndex='30'; document.body.appendChild(fly);
+   if(window.gsap) gsap.fromTo(fly,{y:0,opacity:1},{y:-60,opacity:0,duration:1.1,ease:'power2.out',onComplete:()=>fly.remove()}); else setTimeout(()=>fly.remove(),1100);
+   // baja contador
+   const cnt=g.querySelector('.gift-count'); let n=parseInt(cnt.textContent.replace('x',''))-1; if(n<=0){ cnt.textContent='!'; setTimeout(()=>{ g.style.display='none'; },600); if(window.gsap) gsap.to(g,{scale:0,rotation:180,duration:.4,ease:'back.in(1.2)'})} else cnt.textContent='x'+n;
+  };
+  document.body.appendChild(g);
+  if(window.gsap) gsap.from(g,{y:80,opacity:0,duration:.6,delay:1.2,ease:'back.out(1.2)'});
+ }
+ document.addEventListener('DOMContentLoaded', ()=>{ initCanvas(); ensureGift(); });
+ // si ya cargó
+ if(document.readyState!=='loading'){ initCanvas(); ensureGift(); }
+})();
