@@ -40,7 +40,7 @@ nav a:hover::after,nav a.active::after{transform:scaleX(1)}
 .btn-cta:hover{transform:translateY(-2px) scale(1.02); box-shadow:0 14px 36px rgba(212,175,55,.5)}
 .btn-ghost{background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(212,175,55,.22);padding:15px 24px;border-radius:999px;font-weight:800;cursor:pointer;backdrop-filter:blur(12px)}
 .stats{display:flex;gap:14px;justify-content:center;margin-top:26px;flex-wrap:wrap}
-.stats div{padding:12px 18px;border-radius:16px;min-width:140px; composes:glass; background:rgba(18,18,18,.55); backdrop-filter:blur(16px); border:1px solid rgba(212,175,55,.14)}
+.stats div{padding:12px 18px;border-radius:16px;min-width:140px; background:rgba(18,18,18,.55); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid rgba(212,175,55,.14)}
 .stats b{display:block;font-size:1.25rem;color:var(--gold)}
 .stats span{font-size:.8rem;color:#9a9a9a}
 /* GRID LOBBY */
