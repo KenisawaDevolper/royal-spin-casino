@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Slots — Royal Spin</title><link rel="stylesheet" href="/style.css"><script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Slots — Deluxe Casino</title><link rel="stylesheet" href="/style.css"><script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 </head><body>
 <div class="topbar">🎰 SLOTS ENDPOINT — /slots — Jackpot progresivo</div>
-<header><div class="logo" onclick="location.href='/'">♠️ ROYAL SPIN <span>CASINO</span></div><nav><a href="/">Lobby</a><a href="/slots" class="active">Slots</a><a href="/roulette">Ruleta</a><a href="/blackjack">Blackjack</a><a href="/crash">Crash</a><a href="/mines">Mines</a><a href="/dice">Dados</a></nav><div class="header-actions"><div class="saldo-box">💰 $<span id="saldo">0</span> <small id="userLevel">LVL 1</small></div><button class="btn-deposit" onclick="openDeposit()">DEPOSITAR</button><button class="btn-login" id="btnUser" onclick="openAuth()">INGRESAR</button></div></header>
+<header><div class="logo" onclick="location.href='/'">♠️ DELUXE <span>CASINO</span></div><nav><a href="/">Lobby</a><a href="/slots" class="active">Slots</a><a href="/roulette">Ruleta</a><a href="/blackjack">Blackjack</a><a href="/crash">Crash</a><a href="/mines">Mines</a><a href="/dice">Dados</a></nav><div class="header-actions"><div class="saldo-box">💰 $<span id="saldo">0</span> <small id="userLevel">LVL 1</small></div><button class="btn-deposit" onclick="openDeposit()">DEPOSITAR</button><button class="btn-login" id="btnUser" onclick="openAuth()">INGRESAR</button></div></header>
 <section class="section" style="padding-bottom:0"><a href="/" style="color:#94a3b8;text-decoration:none">← Volver al Lobby</a></section>
 <main class="games-detail" style="margin-top:14px">
 <section class="game-panel">
-<div class="panel-head"><h2>🎰 ROYAL SLOTS — 5 Rodillos</h2><span class="jackpot">JACKPOT $<span id="jackpot">0</span></span></div>
+<div class="panel-head"><h2>🎰 DELUXE SLOTS — 5 Rodillos</h2><span class="jackpot">JACKPOT $<span id="jackpot">0</span></span></div>
 <div class="control-row"><label>Apuesta $ <input type="number" id="apuestaSlots" value="100" min="10" step="10"></label><button onclick="setBet('apuestaSlots',100)">100</button><button onclick="setBet('apuestaSlots',500)">500</button><button onclick="setBet('apuestaSlots',1000)">1000</button><button onclick="setBet('apuestaSlots',5000)">MAX</button></div>
 <div class="slots-display" id="slotsDisplay"><span id="s1">🍒</span><span id="s2">🍋</span><span id="s3">💎</span><span id="s4">7️⃣</span><span id="s5">⭐</span></div>
 <button class="btn-jugar big" onclick="jugarSlots()">🎰 GIRAR</button>
